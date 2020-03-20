@@ -9,11 +9,16 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import com.mongodb.Mongo;
+import java.util.List;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.Document;
+
 
 /**
  *
@@ -55,8 +60,6 @@ DBCollection tabla;
         jLabel2 = new javax.swing.JLabel();
         type = new javax.swing.JTextField();
         jButton3 = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
-        presupuesto = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
 
@@ -81,8 +84,6 @@ DBCollection tabla;
                 jButton3ActionPerformed(evt);
             }
         });
-
-        jLabel3.setText("Presupuesto");
 
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
@@ -109,14 +110,11 @@ DBCollection tabla;
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel3))
+                        .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(presupuesto, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(0, 0, Short.MAX_VALUE)
                                 .addComponent(jButton1))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(rango1, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -129,15 +127,8 @@ DBCollection tabla;
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton1)
-                        .addGap(26, 26, 26))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(presupuesto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)))
+                .addComponent(jButton1)
+                .addGap(26, 26, 26)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(rango1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(rango2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -159,19 +150,15 @@ DBCollection tabla;
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-            BasicDBObject filtro = new BasicDBObject();
-            BasicDBObject filtro2 = new BasicDBObject();
             int r1= Integer.parseInt(rango1.getText());
             int r2= Integer.parseInt(rango2.getText());
-            int pres=Integer.parseInt(presupuesto.getText());
-            filtro.put("price", pres<r2);
-            filtro2.put("price", pres>r1);
-            DBCursor  cursor = tabla.find(filtro);
-            DBCursor  cursor2 = tabla.find(filtro2);
-            while(cursor.hasNext()){
-                jTextArea1.setText("");
-                jTextArea1.setText(jTextArea1.getText()+"\n"+cursor.next());
-                jTextArea1.setText(jTextArea1.getText()+"\n"+cursor2.next());
+            List<DBObject> criteria = new ArrayList<DBObject>();
+            criteria.add(new BasicDBObject("price", new BasicDBObject("$gte", r1)));
+            criteria.add(new BasicDBObject("price", new BasicDBObject("$lte", r2)));
+            DBCursor dbCursor = tabla.find(new BasicDBObject("$and", criteria));
+            while(dbCursor.hasNext()){
+                jTextArea1.setText(jTextArea1.getText()+"\n"+dbCursor.next());
+                
            }
            
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -227,10 +214,8 @@ DBCollection tabla;
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextField presupuesto;
     private javax.swing.JTextField rango1;
     private javax.swing.JTextField rango2;
     private javax.swing.JTextField type;
